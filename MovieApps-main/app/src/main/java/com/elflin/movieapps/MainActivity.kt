@@ -1,18 +1,32 @@
 package com.elflin.movieapps
-import com.elflin.movieapps.ui.view.AppContent
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import com.elflin.movieapps.ui.view.AppContent2
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.elflin.movieapps.data.DataStoreManager
+import com.elflin.movieapps.ui.MovieAppsRoute
+import com.elflin.movieapps.viewmodel.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppContent2()
+            // Obtain the AuthViewModel using the viewModel() delegate
+            val authViewModel: AuthViewModel = viewModel()
+
+            // Obtain the lifecycleOwner
+            val lifecycleOwner = LocalLifecycleOwner.current
+
+            // Create or obtain an instance of DataStoreManager
+            val context = LocalContext.current
+            val dataStore = DataStoreManager(context)
+            MovieAppsRoute(authViewModel, dataStore, lifecycleOwner)
         }
     }
 }

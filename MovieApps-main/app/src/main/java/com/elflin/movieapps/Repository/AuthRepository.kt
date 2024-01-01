@@ -6,6 +6,12 @@ import javax.inject.Inject
 class AuthRepository @Inject constructor(
     private val api : EndPointAPI
 ) {
+
+    companion object{
+        var ACCESS_TOKEN = ""
+
+    }
+
     suspend fun registerUser(
         user_username : String,
         user_email:String,

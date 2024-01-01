@@ -35,6 +35,9 @@ android {
             )
         }
     }
+
+
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -70,7 +73,8 @@ android {
 dependencies {
     var lifecycle_version = "2.5.1"
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.1")
-
+    implementation("androidx.navigation:navigation-compose")
+    implementation( "androidx.lifecycle:lifecycle-runtime-compose")
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
@@ -124,6 +128,14 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1")
 
+    //Preferences DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // optional - RxJava2 support
+    implementation("androidx.datastore:datastore-preferences-rxjava2:1.0.0")
+
+    // optional - RxJava3 support
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0")
     //Coroutine lifecycle scopes
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0")

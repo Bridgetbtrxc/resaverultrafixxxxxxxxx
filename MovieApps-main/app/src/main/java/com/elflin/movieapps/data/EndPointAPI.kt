@@ -37,7 +37,7 @@ interface EndPointAPI {
 @FormUrlEncoded
 @POST("login")
 suspend fun login(@Field("email") user_email:String,
-                  @Field("password") user_password:String): Response<JsonObject>
+                  @Field("password") user_password:String): Response<String>
 
 
     // Get login information using the token for authentication

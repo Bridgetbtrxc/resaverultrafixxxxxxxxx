@@ -10,7 +10,7 @@ import androidx.lifecycle.MutableLiveData
 
 import androidx.lifecycle.viewModelScope
 import com.elflin.movieapps.Application
-import com.elflin.movieapps.MainActivity
+
 
 
 import dagger.hilt.android.internal.Contexts.getApplication
@@ -20,7 +20,9 @@ import kotlinx.coroutines.launch
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.elflin.movieapps.Repository.AuthRepository
+import com.elflin.movieapps.data.DataStoreManager
 import com.elflin.movieapps.model.LoginRequest
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -32,9 +34,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val repo: AuthRepository
+    private val repo: AuthRepository,
+    private val dataStore : DataStoreManager
+
 ): ViewModel(){
 
+//    init {
+//        // Example usage: Replace 'context' with actual context if needed.
+//         initAuth(context)
+//    }
+private val _isLoggedIn = MutableLiveData<Boolean>()
+    val isLoggedIn: LiveData<Boolean> get() = _isLoggedIn
 
     private val _userEmail = MutableLiveData<String>()
     val userEmail: LiveData<String> get() = _userEmail
@@ -43,12 +53,30 @@ class AuthViewModel @Inject constructor(
         MutableLiveData<String>()
     }
 
-    private val _isLoggedIn = MutableLiveData<Boolean>()
-    val isLoggedIn: LiveData<Boolean> get() = _isLoggedIn
+    private val _token = MutableLiveData<String>()
+    val token: LiveData<String> get() = _token
+
+
+    private fun checkLoginStatus() = viewModelScope.launch {
+        dataStore.getToken.collect { token ->
+            _isLoggedIn.value = !token.isNullOrEmpty()
+        }
+    }
+
+    fun initAuth(context: Context) {
+        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        _token.value = sharedPreferences.getString("token", "")
+        _isLoggedIn.value = !_token.value.isNullOrEmpty()
+    }
+
+  init{
+      checkLoginStatus()
+  }
 
 
 
-    private fun checkLoginStatus(context: Context) {
+
+    fun checkLoginStatus(context: Context) {
         viewModelScope.launch {
             val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
             val token = sharedPreferences.getString("token", "")
@@ -111,21 +139,41 @@ class AuthViewModel @Inject constructor(
         return sharedPreferences.getString("token", "") ?: ""
     }
 
-
     private fun saveToken(context: Context, token: String) {
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit().putString("token", token).apply()
+        with(sharedPreferences.edit()) {
+            putString("token", token)
+            apply() // or use commit() if you need to save it synchronously
+        }
     }
 
     private fun clearToken(context: Context) {
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit().remove("token").apply()
+        with(sharedPreferences.edit()) {
+            remove("token")
+            apply() // or use commit() if you need to save it synchronously
+        }
     }
+
+//    private fun saveToken(context: Context, token: String) {
+//        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+//        sharedPreferences.edit().putString("token", token).apply()
+//        Log.d("AuthViewModel", "Token saved: $token")
+//
+//    }
+
+//    private fun clearToken(context: Context) {
+//        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+//        sharedPreferences.edit().remove("token").apply()
+//        Log.d("AuthViewModel", "Token cleared")
+//    }
+
 
 
 
     fun logoutuser(context: Context) = viewModelScope.launch {
         clearToken(context) // Clear token
+        dataStore.clearToken()
         _logout.value = "User successfully logged out"
         _isLoggedIn.value = false
         _userEmail.value = ""
@@ -133,28 +181,44 @@ class AuthViewModel @Inject constructor(
 
 
 
-    fun loginUser(user_email: String, user_password: String, context: Context) = viewModelScope.launch {
+    fun loginUser(user_email: String, user_password: String, context: Context, navController: NavController,
+
+    ) = viewModelScope.launch {
         try {
             val response = repo.loginUser(user_email, user_password)
             if (response.isSuccessful) {
                 // Parse the JSON response to get the token
-                val tokenJson = response.body()?.string().orEmpty()
-                val token = JsonParser.parseString(tokenJson).asJsonObject.get("token").asString
+                val tokenJson = response.body()
+                print(tokenJson)
+                Log.e("login error 2", tokenJson.toString())
+                val token = tokenJson.toString()
+
 
                 if (token.isNotEmpty()) {
-                    saveToken(context, token)
+//                    saveToken(context, token)
+                    dataStore.saveToken(token)
                     _isLoggedIn.value = true
                     _userEmail.value = user_email
                     _login.value = "User successfully logged in"
+                    Log.e("login error 1", "aaa")
+
                 } else {
+                    Log.e("login error 2", "aaa")
                     _login.value = "Error: Empty token"
                 }
             } else {
+                response.errorBody()?.string()?.let { Log.e("login error 3", it) }
+                print("login exception2: " + response.errorBody()?.string())
                 _login.value = "Error: " + response.errorBody()?.string()
             }
         } catch (e: Exception) {
+            Log.e("login error 4", "aaa")
+            print("login exception: " + e.message)
             _login.value = "Exception: " + e.message
+            e.message?.let { Log.e("login error 4", it) }
         }
+
+
     }
 
 

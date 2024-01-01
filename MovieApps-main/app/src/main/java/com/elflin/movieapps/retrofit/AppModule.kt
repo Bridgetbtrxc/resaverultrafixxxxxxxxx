@@ -1,9 +1,11 @@
 package com.elflin.movieapps.retrofit
 
 import android.content.Context
+import com.elflin.movieapps.data.DataStoreManager
 import com.elflin.movieapps.data.EndPointAPI
 import com.elflin.movieapps.helper.Const
 import com.elflin.movieapps.retrofit.RetrofitInstance.api
+import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,7 +31,11 @@ object AppModule {
             EndPointAPI {
         return retrofit.create(EndPointAPI::class.java)
     }
-
+@Singleton
+    @Provides
+    fun provideDataStoreManager(@ApplicationContext context: Context): DataStoreManager {
+        return DataStoreManager(context)
+    }
     @Singleton
     @Provides
     fun provideOkHttpClient(@ApplicationContext context: Context): OkHttpClient {
@@ -50,6 +56,7 @@ object AppModule {
     @Singleton
     @Provides
     fun getRetrofitInstance(okHttpClient: OkHttpClient): Retrofit {
+
         return Retrofit.Builder()
             .baseUrl(Const.BASE_URL)
             .client(okHttpClient)
