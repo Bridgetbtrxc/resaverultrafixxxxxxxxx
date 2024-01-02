@@ -329,6 +329,7 @@ fun NavBar(navController: NavController) {
                 painter = painterResource(id = R.drawable.baseline_home_23),
                 contentDescription = "",
                 modifier = Modifier
+                    .clickable { navController.navigate("home") }
                     .size(25.dp)
                     .aspectRatio(1f)
                     .fillMaxHeight()
@@ -352,6 +353,7 @@ fun NavBar(navController: NavController) {
                 contentDescription = "",
                 modifier = Modifier
                     .size(25.dp)
+                    .clickable { navController.navigate("insight") }
                     .aspectRatio(1f)
                     .fillMaxHeight()
             )
@@ -377,9 +379,10 @@ fun NavBar(navController: NavController) {
                 modifier = Modifier
                     .size(25.dp)
                     .aspectRatio(1f)
+                    .clickable { navController.navigate("lockview") }
                     .fillMaxHeight()
                     .clickable {
-                        navController.navigate("lockview_screen")
+                        navController.navigate("lockview")
                     }
             )
             Text(
@@ -404,8 +407,9 @@ fun NavBar(navController: NavController) {
                     .size(25.dp)
                     .aspectRatio(1f)
                     .fillMaxHeight()
+                    .clickable { navController.navigate("profileview") }
                     .clickable {
-                        navController.navigate("profile_screen")
+                        navController.navigate("ProfileView")
                     }
             )
 

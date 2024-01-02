@@ -26,8 +26,11 @@ import com.elflin.movieapps.ui.view.LoginView
 import com.elflin.movieapps.ui.view.GetStartedView
 import com.elflin.movieapps.ui.view.LoginView
 import com.elflin.movieapps.ui.view.HomeView
+import com.elflin.movieapps.ui.view.InsightView
 
 import com.elflin.movieapps.viewmodel.AuthViewModel
+import com.elflin.movieapps.ui.view.LockView
+import com.elflin.movieapps.ui.view.ProfileView
 
 @Composable
 fun MovieAppsRoute(authViewModel: AuthViewModel, dataStore: DataStoreManager, lifecycleOwner: LifecycleOwner,) {
@@ -50,6 +53,17 @@ fun MovieAppsRoute(authViewModel: AuthViewModel, dataStore: DataStoreManager, li
     composable("home") {
       HomeView(navController)
     }
+
+    composable("insight") {
+      InsightView(navController)  // Replace with your InsightView Composable
+    }
+    composable("lockview") {
+      LockView(navController)  // Replace with your LockView Composable
+    }
+    composable("profileview") {
+      ProfileView(navController)  // Replace with your ProfileView Composable
+    }
+
   }
 
   // Respond to changes in isLoggedIn

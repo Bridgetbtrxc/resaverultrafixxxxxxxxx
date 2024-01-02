@@ -1,8 +1,5 @@
-package com.example.alp_resaver.view
+package com.elflin.movieapps.ui.view
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,7 +12,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,11 +22,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposableTarget
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,7 +44,7 @@ import com.elflin.movieapps.ui.theme.MovieAppsTheme
 
 
 @Composable
-fun Lock1(navController: NavController) {
+fun LockView(navController: NavController) {
     Column {
         TopBar3(navController)
 
@@ -64,14 +57,14 @@ fun Lock1(navController: NavController) {
         }
 
 
-
-        NavBar2(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .padding(bottom = 16.dp),
-            navController = navController
-        )
+      NavBar2(navController)
+//        NavBar2(
+//           modifier = Modifier
+//                .fillMaxWidth()
+//                .height(70.dp)
+//                .padding(bottom = 16.dp),
+//            navController = navController
+//        )
     }
 }
 
@@ -251,7 +244,7 @@ fun LockBarLock() {
     }
 }
 @Composable
-fun NavBar2(modifier: Modifier = Modifier, navController: NavController) {
+fun NavBar2(navController: NavController) {
 
     Row(
 
@@ -271,20 +264,16 @@ fun NavBar2(modifier: Modifier = Modifier, navController: NavController) {
 
             Image(
 
-                painter = painterResource(id = R.drawable.baseline_home_24),
+                painter = painterResource(id = R.drawable.baseline_home_23),
                 contentDescription = "",
                 modifier = Modifier
+                    .clickable { navController.navigate("home") }
                     .size(25.dp)
                     .aspectRatio(1f)
                     .fillMaxHeight()
-                    .clickable {
-                        navController.popBackStack()
-                    }
-
             )
             Text(
                 text = "Home",
-                color = Color.Gray,
                 fontSize = 11.sp,
                 modifier = Modifier
                     .padding(horizontal = 6.dp, vertical = 5.dp)
@@ -302,6 +291,7 @@ fun NavBar2(modifier: Modifier = Modifier, navController: NavController) {
                 contentDescription = "",
                 modifier = Modifier
                     .size(25.dp)
+                    .clickable { navController.navigate("insight") }
                     .aspectRatio(1f)
                     .fillMaxHeight()
             )
@@ -322,15 +312,20 @@ fun NavBar2(modifier: Modifier = Modifier, navController: NavController) {
 
             Image(
 
-                painter = painterResource(id = R.drawable.baseline_lock_23),
+                painter = painterResource(id = R.drawable.baseline_lock_24),
                 contentDescription = "",
                 modifier = Modifier
                     .size(25.dp)
                     .aspectRatio(1f)
+                    .clickable { navController.navigate("lockview") }
                     .fillMaxHeight()
+                    .clickable {
+                        navController.navigate("lockview")
+                    }
             )
             Text(
                 text = "Lock",
+                color = Color.Gray,
                 fontSize = 11.sp,
                 modifier = Modifier
                     .padding(horizontal = 6.dp, vertical = 5.dp)
@@ -350,6 +345,10 @@ fun NavBar2(modifier: Modifier = Modifier, navController: NavController) {
                     .size(25.dp)
                     .aspectRatio(1f)
                     .fillMaxHeight()
+                    .clickable { navController.navigate("profileview") }
+                    .clickable {
+                        navController.navigate("ProfileView")
+                    }
             )
 
             Text(
@@ -358,20 +357,18 @@ fun NavBar2(modifier: Modifier = Modifier, navController: NavController) {
                 fontSize = 11.sp,
                 modifier = Modifier
                     .padding(horizontal = 6.dp, vertical = 5.dp)
-                    .clickable {
-                        navController.navigate("profile_screen")
-                    }
             )
         }
     }
 }
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LockPreview1() {
     val navController = rememberNavController()
     MovieAppsTheme {
-        Lock1(navController = navController)
+        LockView(navController = navController)
     }
 }
 

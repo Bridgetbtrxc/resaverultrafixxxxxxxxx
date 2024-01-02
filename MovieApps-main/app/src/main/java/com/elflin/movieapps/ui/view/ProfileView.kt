@@ -1,31 +1,18 @@
-package com.example.alp_resaver.view
+package com.elflin.movieapps.ui.view
 
-import android.os.Bundle
-import android.provider.ContactsContract.Profile
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,20 +21,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.elflin.movieapps.R
-import com.example.alp_resaver.model.home_model
-import com.elflin.movieapps.ui.theme.MovieAppsTheme
 
 
 @Composable
-fun Profile1(navController: NavController){
+fun ProfileView(navController: NavController){
 
     Column {
         TopBar5(navController = navController)
@@ -55,13 +38,7 @@ fun Profile1(navController: NavController){
 
         Spacer(modifier = Modifier.height(320.dp))
 
-        NavBar5(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-
-            navController = navController
-        )
+        NavBar3(navController)
     }
 }
 
@@ -201,10 +178,8 @@ fun ProfileBar(){
         }
     }
 }
-
-
 @Composable
-fun NavBar5(modifier: Modifier = Modifier, navController: NavController) {
+fun NavBar3(navController: NavController) {
 
     Row(
 
@@ -213,6 +188,7 @@ fun NavBar5(modifier: Modifier = Modifier, navController: NavController) {
 
         modifier = Modifier
             .fillMaxWidth()
+            .height(70.dp)
 
     ) {
 
@@ -223,19 +199,16 @@ fun NavBar5(modifier: Modifier = Modifier, navController: NavController) {
 
             Image(
 
-                painter = painterResource(id = R.drawable.baseline_home_24),
+                painter = painterResource(id = R.drawable.baseline_home_23),
                 contentDescription = "",
                 modifier = Modifier
+                    .clickable { navController.navigate("home") }
                     .size(25.dp)
                     .aspectRatio(1f)
                     .fillMaxHeight()
-                    .clickable {
-                        navController.popBackStack()
-                    }
             )
             Text(
                 text = "Home",
-                color = Color.Gray,
                 fontSize = 11.sp,
                 modifier = Modifier
                     .padding(horizontal = 6.dp, vertical = 5.dp)
@@ -253,6 +226,7 @@ fun NavBar5(modifier: Modifier = Modifier, navController: NavController) {
                 contentDescription = "",
                 modifier = Modifier
                     .size(25.dp)
+                    .clickable { navController.navigate("insight") }
                     .aspectRatio(1f)
                     .fillMaxHeight()
             )
@@ -278,7 +252,11 @@ fun NavBar5(modifier: Modifier = Modifier, navController: NavController) {
                 modifier = Modifier
                     .size(25.dp)
                     .aspectRatio(1f)
+                    .clickable { navController.navigate("lockview") }
                     .fillMaxHeight()
+                    .clickable {
+                        navController.navigate("lockview")
+                    }
             )
             Text(
                 text = "Lock",
@@ -286,9 +264,6 @@ fun NavBar5(modifier: Modifier = Modifier, navController: NavController) {
                 fontSize = 11.sp,
                 modifier = Modifier
                     .padding(horizontal = 6.dp, vertical = 5.dp)
-                    .clickable {
-                        navController.navigate("lockview_screen")
-                    }
             )
         }
 
@@ -299,16 +274,21 @@ fun NavBar5(modifier: Modifier = Modifier, navController: NavController) {
 
             Image(
 
-                painter = painterResource(id = R.drawable.baseline_person_24),
+                painter = painterResource(id = R.drawable.baseline_person_23),
                 contentDescription = "",
                 modifier = Modifier
                     .size(25.dp)
                     .aspectRatio(1f)
                     .fillMaxHeight()
+                    .clickable { navController.navigate("profileview") }
+                    .clickable {
+                        navController.navigate("ProfileView")
+                    }
             )
 
             Text(
                 text = "Profile",
+                color = Color.Gray,
                 fontSize = 11.sp,
                 modifier = Modifier
                     .padding(horizontal = 6.dp, vertical = 5.dp)
