@@ -1,5 +1,6 @@
 package com.elflin.movieapps.ui.view
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,14 +30,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.elflin.movieapps.R
+import com.elflin.movieapps.viewmodel.AuthViewModel
+
 
 
 @Composable
-fun ProfileView(navController: NavController){
+fun ProfileView(navController: NavController, authViewModel: AuthViewModel, context: Context){
 
     Column {
         TopBar5(navController = navController)
-        ProfileBar()
+        ProfileBar(authViewModel, context)
 
         Spacer(modifier = Modifier.height(320.dp))
 
@@ -78,15 +83,15 @@ fun TopBar5(navController: NavController) {
 }
 
 @Composable
-fun ProfileBar(){
-
+fun ProfileBar(authViewModel: AuthViewModel, context: Context){
+    val userName by authViewModel.userName.observeAsState("")
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 15.dp)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.bridgetturu),
+            painter = painterResource(id = R.drawable.profile),
             contentDescription = "Image Compose",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -96,7 +101,7 @@ fun ProfileBar(){
         )
 
         Text(
-            text = "Bridget Beatrix Claire",
+            text = userName ,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
@@ -165,6 +170,7 @@ fun ProfileBar(){
                 modifier = Modifier
                     .size(50.dp)
                     .clip(shape = RoundedCornerShape(100.dp))
+                    .clickable { authViewModel.logoutuser(context)}
             )
 
             Text(

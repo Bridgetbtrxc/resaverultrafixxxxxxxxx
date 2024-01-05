@@ -28,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,11 +46,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.elflin.movieapps.R
 import com.elflin.movieapps.ui.theme.MovieAppsTheme
+import com.elflin.movieapps.viewmodel.AuthViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeView(navController: NavController){
+fun HomeView(navController: NavController, authViewModel: AuthViewModel){
 
     Scaffold(
         bottomBar = {NavBar(navController)}
@@ -60,7 +62,7 @@ fun HomeView(navController: NavController){
                 modifier = Modifier.fillMaxSize(),
                 content = {
                     item {
-                        Menu1(navController)
+                        Menu1(navController, authViewModel)
                     }
                     item {
                         TransactionCard(onDeleteClicked = {})
@@ -75,8 +77,8 @@ fun HomeView(navController: NavController){
 }
 
 @Composable
-fun Menu1(navController: NavController){
-
+fun Menu1(navController: NavController, authViewModel: AuthViewModel){
+    val userName by authViewModel.userName.observeAsState("")
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -104,7 +106,7 @@ fun Menu1(navController: NavController){
                     .weight(1f)
             ) {
                 Text(
-                    text = "Hi Bridget",
+                    text = "Hi , $userName ! ",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 4.dp) // Reduced bottom padding
@@ -458,6 +460,9 @@ fun ClickableRow(navController: NavController) {
             color = if (isClicked) Color.White else Color.Black,
             fontSize = 11.sp,
             modifier = Modifier
+                .clickable {
+                    navController.navigate("topupadd_screen")
+                }
                 .padding(horizontal = 6.dp)
                 .fillMaxHeight()
 
@@ -544,12 +549,12 @@ fun ClickableRow2(navController: NavController) {
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun HomeViewPreview() {
-    val navController = rememberNavController()
-    MovieAppsTheme {
-        HomeView(navController = navController)
-    }
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun HomeViewPreview() {
+//    val navController = rememberNavController()
+//    MovieAppsTheme {
+//        HomeView(navController = navController)
+//    }
+//}
 

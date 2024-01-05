@@ -1,6 +1,6 @@
 package com.example.alp_resaver.view
 
-import TransactionNameDialog
+
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity

@@ -45,6 +45,8 @@ class AuthViewModel @Inject constructor(
 //    }
 private val _isLoggedIn = MutableLiveData<Boolean>()
     val isLoggedIn: LiveData<Boolean> get() = _isLoggedIn
+    private val _userName = MutableLiveData<String>()
+    val userName: LiveData<String> get() = _userName
 
     private val _userEmail = MutableLiveData<String>()
     val userEmail: LiveData<String> get() = _userEmail
@@ -55,6 +57,8 @@ private val _isLoggedIn = MutableLiveData<Boolean>()
 
     private val _token = MutableLiveData<String>()
     val token: LiveData<String> get() = _token
+
+
 
 
     private fun checkLoginStatus() = viewModelScope.launch {
@@ -177,6 +181,8 @@ private val _isLoggedIn = MutableLiveData<Boolean>()
         _logout.value = "User successfully logged out"
         _isLoggedIn.value = false
         _userEmail.value = ""
+
+
     }
 
 
@@ -199,6 +205,8 @@ private val _isLoggedIn = MutableLiveData<Boolean>()
                     dataStore.saveToken(token)
                     _isLoggedIn.value = true
                     _userEmail.value = user_email
+                    val username = extractUsernameFromEmail(user_email)
+                    _userName.value = username
                     _login.value = "User successfully logged in"
                     Log.e("login error 1", "aaa")
 
@@ -222,7 +230,9 @@ private val _isLoggedIn = MutableLiveData<Boolean>()
     }
 
 
-
+    private fun extractUsernameFromEmail(email: String): String {
+        return email.substringBefore('@')
+    }
 
 
 

@@ -1,5 +1,6 @@
 package com.elflin.movieapps.ui
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,9 +32,11 @@ import com.elflin.movieapps.ui.view.InsightView
 import com.elflin.movieapps.viewmodel.AuthViewModel
 import com.elflin.movieapps.ui.view.LockView
 import com.elflin.movieapps.ui.view.ProfileView
+import com.elflin.movieapps.ui.view.TopUpAddView
+import com.elflin.movieapps.viewmodel.MainViewModel
 
 @Composable
-fun MovieAppsRoute(authViewModel: AuthViewModel, dataStore: DataStoreManager, lifecycleOwner: LifecycleOwner,) {
+fun MovieAppsRoute(authViewModel: AuthViewModel, dataStore: DataStoreManager, lifecycleOwner: LifecycleOwner,context: Context,mainViewModel: MainViewModel) {
   val navController = rememberNavController()
   val isLoggedIn by authViewModel.isLoggedIn.observeAsState()
 
@@ -41,9 +44,15 @@ fun MovieAppsRoute(authViewModel: AuthViewModel, dataStore: DataStoreManager, li
   val startDestination = if (isLoggedIn == true) "home" else "getStarted"
 
   NavHost(navController = navController, startDestination = startDestination) {
+
     composable("getStarted") {
       GetStartedView(onGetStartedClicked = { navController.navigate("login") })
     }
+
+    composable("topupadd_screen") {
+      TopUpAddView(navController,authViewModel, mainViewModel)  // Replace with your actual TopUpAddView composable
+    }
+
     composable("login") {
       LoginView(authViewModel,
         lifecycleOwner,
@@ -51,7 +60,11 @@ fun MovieAppsRoute(authViewModel: AuthViewModel, dataStore: DataStoreManager, li
         dataStore)
     }
     composable("home") {
-      HomeView(navController)
+      HomeView(navController, authViewModel)
+    }
+
+    composable("Add") {
+      HomeView(navController, authViewModel)
     }
 
     composable("insight") {
@@ -61,7 +74,7 @@ fun MovieAppsRoute(authViewModel: AuthViewModel, dataStore: DataStoreManager, li
       LockView(navController)  // Replace with your LockView Composable
     }
     composable("profileview") {
-      ProfileView(navController)  // Replace with your ProfileView Composable
+      ProfileView(navController,authViewModel, context)  // Replace with your ProfileView Composable
     }
 
   }
@@ -113,6 +126,7 @@ fun MovieAppsRoute(authViewModel: AuthViewModel, dataStore: DataStoreManager, li
 @Composable
 fun AppContent() {
   val authViewModel: AuthViewModel = viewModel()
+  val mainViewModel: MainViewModel = viewModel()
 
   // Obtain the lifecycleOwner
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -120,6 +134,6 @@ fun AppContent() {
   // Create or obtain an instance of DataStoreManager
   val context = LocalContext.current
   val dataStore = DataStoreManager(context)
-  MovieAppsRoute(authViewModel, dataStore, lifecycleOwner)
+  MovieAppsRoute(authViewModel, dataStore, lifecycleOwner, context,mainViewModel)
 }
 

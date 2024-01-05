@@ -1,4 +1,5 @@
-import android.content.Context
+package com.elflin.movieapps.ui.view
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,9 +27,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,33 +43,59 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.elflin.movieapps.R
-import kotlinx.coroutines.CoroutineScope
+import com.elflin.movieapps.viewmodel.AuthViewModel
+import com.elflin.movieapps.viewmodel.MainViewModel
 
 
 @Composable
-fun Topup1(navController: NavController){
-
+fun TopUpAddView(navController: NavController, authViewModel: AuthViewModel, mainViewModel: MainViewModel) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val token by authViewModel.token.observeAsState()
 
-    Column(
-        modifier = Modifier
-            .background(
-                color =  Color(0xFF5A45FE)
-            )
-    ) {
+    var expenseName by rememberSaveable { mutableStateOf("") }
+    var expenseAmount by rememberSaveable { mutableStateOf(0) }
+    var selectedCategory by rememberSaveable { mutableStateOf("") }
+    var categoryId by remember { mutableStateOf(-1) }
+
+    Column(modifier = Modifier.background(color = Color(0xFF5A45FE))) {
         TopBar(navController)
-        Calculator(context = context, coroutineScope = coroutineScope,  navController = navController)
+        CustomField(label = "Expense Name", value = expenseName) { expenseName = it }
+        CustomField2(label = "Amount", amount = expenseAmount,) { newValue ->
+            expenseAmount = newValue.toIntOrNull() ?: 0
+        }
+
+        CustomDropdownMenu(mainViewModel, categories = listOf("Needs", "Wants", "Savings"), selectedCategory = selectedCategory, onCategorySelected = { category ->
+            selectedCategory = category
+            categoryId = mainViewModel.getCategoryId(category)
+        })
+
+        Text(
+            text = "Continue",
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            modifier = Modifier
+                .align(alignment = Alignment.CenterHorizontally)
+                .padding(bottom = 1.dp)
+                .fillMaxWidth()
+                .background(Color(0xFFD2F801), RoundedCornerShape(16.dp))
+                .padding(horizontal = 135.dp, vertical = 15.dp)
+                .clickable {
+                    token?.let { tkn ->
+                        if (categoryId != -1) {
+                            mainViewModel.AddExpense(expenseName, expenseAmount, categoryId, tkn)
+                        }
+                    }
+                }
+        )
     }
 }
-
 
 
 @Composable
@@ -120,137 +148,6 @@ fun TopBar(navController: NavController) {
     }
 }
 
-@Composable
-fun Calculator(context: Context, coroutineScope: CoroutineScope, navController: NavController) {
-
-    val categories = listOf("Needs", "Wants", "Savings")
-    var input_number by rememberSaveable { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf(categories.first()) }
-
-    var showDialog by remember { mutableStateOf(false) }
-    var transactionName by remember { mutableStateOf("") }
-
-    val currencyOptions = listOf(
-        Pair("Rp", R.drawable.indonesiaaah)
-    )
-
-    var selectedCurrency by remember { mutableStateOf(currencyOptions.first()) }
-
-
-    Box(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
-            )
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 25.dp, vertical = 30.dp)
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = "Amount",
-                fontSize = 16.sp,
-            )
-
-            CustomTextFieldWithImageAndDropdown(
-                value = input_number,
-                onValueChanged = { input_number = it },
-                currencyOptions = currencyOptions,
-                selectedCurrency = selectedCurrency,
-                onCurrencySelected = { selectedCurrency = it },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            )
-
-
-            Text(
-                text = "Category",
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .padding(vertical = 12.dp)
-            )
-
-            CustomDropdownMenu(
-                categories = categories,
-                selectedCategory = selectedCategory,
-                onCategorySelected = { selectedCategory = it },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 35.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                repeat(3) { rowIndex ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        repeat(3) { columnIndex ->
-                            CalculatorKey(
-                                text = (rowIndex * 3 + columnIndex + 1).toString(),
-                                onClick = { input_number += (rowIndex * 3 + columnIndex + 1).toString() }
-                            )
-                        }
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    CalculatorKey(text = "*", onClick = { input_number += "0" })
-                    CalculatorKey(text = "0", onClick = { input_number += "." })
-                    CalculatorKey(text = "X", onClick = { input_number = "" })
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Continue",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier
-                    .align(alignment = Alignment.CenterHorizontally)
-                    .padding(bottom = 1.dp)
-                    .fillMaxWidth()
-                    .background(Color(0xFFD2F801), RoundedCornerShape(16.dp))
-                    .padding(horizontal = 135.dp, vertical = 15.dp)
-                    .clickable {
-                        showDialog = true
-                    }
-            )
-
-            if (showDialog) {
-                TransactionNameDialog(
-                    onDismiss = { showDialog = false },
-                    onConfirm = { name ->
-                        // Lakukan sesuatu dengan nama transaksi yang diinput
-                        transactionName = name
-                        // Tutup dialog setelah konfirmasi
-                        showDialog = false
-                    },
-                    navController = navController
-                )
-            }
-        }
-    }
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -281,6 +178,7 @@ fun TransactionNameDialog(
 
                     onConfirm(transactionName)
                     navController.popBackStack()
+
                 }
             ) {
                 Text("Confirm")
@@ -295,29 +193,8 @@ fun TransactionNameDialog(
 }
 
 
-@Composable
-fun CalculatorKey(text: String, onClick: () -> Unit) {
-    Box(
 
-        modifier = Modifier
-            .height(65.dp)
-            .width(115.dp)
-            .clickable { onClick() }
-            .padding(8.dp)
-            .background(Color(0xC4F3F3F3), shape = RoundedCornerShape(10.dp))
-    ) {
-        Text(
-            text = text,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.Black,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 12.dp)
-        )
-    }
-}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -435,10 +312,10 @@ fun DropdownIcon(
         }
     }
 }
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomDropdownMenu(
+    viewModel: MainViewModel,
     categories: List<String>,
     selectedCategory: String,
     onCategorySelected: (String) -> Unit,
@@ -478,7 +355,6 @@ fun CustomDropdownMenu(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    onCategorySelected(category)
                                     expanded = false
                                 }
                                 .padding(16.dp)
@@ -490,4 +366,198 @@ fun CustomDropdownMenu(
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomField(
+    label: String, value: String, onValueChange: (String) -> Unit
+) {
+    var expenseName by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+
+    ) {
+        TextField(
+            value = expenseName,
+            onValueChange = { expenseName = it },
+            label = { Text("Expense Name") },
+            singleLine = true,
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = Color.Black,
+                placeholderColor = Color.Gray,
+                focusedLabelColor = Color.White,
+                unfocusedLabelColor = Color.White
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxWidth()
+                .background(color = Color.White, shape = RoundedCornerShape(16.dp))
+                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(16.dp))
+                .padding(vertical = 3.dp)
+                .background(color = Color.Transparent, shape = RoundedCornerShape(4.dp))
+                .padding(horizontal = 16.dp)
+        )
+        // You can add other UI elements here as needed
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomField2(
+    label: String, amount: Int, onValueChange: (String) -> Unit
+) {
+    var expenseAmount by remember { mutableStateOf(0) }
+    expenseAmount = amount
+
+    Column(
+        modifier = Modifier
+
+    ) {
+        TextField(
+            value = expenseAmount,
+            onValueChange = { newValue ->
+                expenseAmount = newValue.toIntOrNull() ?: 0 },
+            label = { Text("Expense Amount") },
+            singleLine = true,
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = Color.Black,
+                placeholderColor = Color.Gray,
+                focusedLabelColor = Color.White,
+                unfocusedLabelColor = Color.White
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxWidth()
+                .background(color = Color.White, shape = RoundedCornerShape(16.dp))
+                .border(width = 1.dp, color = Color.Black, shape = RoundedCornerShape(16.dp))
+                .padding(vertical = 3.dp)
+                .background(color = Color.Transparent, shape = RoundedCornerShape(4.dp))
+                .padding(horizontal = 16.dp)
+        )
+        // You can add other UI elements here as needed
+    }
+}
+
+//    @Composable
+//fun Calculator(
+//    context: Context, coroutineScope: CoroutineScope, navController: NavController,
+//    mainViewModel: MainViewModel,
+//    expenseName: String, expenseAmount: Int, selectedCategory:String, token:String) {
+//
+//    val categories = listOf("Needs", "Wants", "Savings")
+//    var input_number by rememberSaveable { mutableStateOf("") }
+//    var expanded by remember { mutableStateOf(false) }
+//    var selectedCategory by remember { mutableStateOf(categories.first()) }
+//    var showDialog by remember { mutableStateOf(false) }
+//    var transactionName by remember { mutableStateOf("") }
+//    Box(
+//        modifier = Modifier
+//            .fillMaxHeight()
+//            .fillMaxWidth()
+//            .background(
+//                color = Color.White,
+//                shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
+//            )
+//    ) {
+//        Column(
+//            modifier = Modifier
+//                .padding(horizontal = 25.dp, vertical = 30.dp)
+//                .fillMaxWidth()
+//        ) {
+//            Text(
+//                text = "Expense Name",
+//                fontSize = 16.sp,
+//                modifier = Modifier
+//                    .padding(vertical = 12.dp)
+//            )
+//
+//
+//
+//
+//            Text(
+//                text = "Amount",
+//                fontSize = 16.sp,
+//            )
+//
+//            CustomTextFieldWithImageAndDropdown(
+//                value = input_number,
+//                onValueChanged = { input_number = it },
+//                currencyOptions = currencyOptions,
+//                selectedCurrency = selectedCurrency,
+//                onCurrencySelected = { selectedCurrency = it },
+//                keyboardOptions = KeyboardOptions.Default.copy(
+//                    keyboardType = KeyboardType.Number,
+//                    imeAction = ImeAction.Done
+//                ),
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(vertical = 8.dp)
+//            )
+//
+//
+//            Text(
+//                text = "Category",
+//                fontSize = 16.sp,
+//                modifier = Modifier
+//                    .padding(vertical = 12.dp)
+//            )
+//
+//            CustomDropdownMenu(
+//                categories = categories,
+//                selectedCategory = selectedCategory,
+//                onCategorySelected = { selectedCategory = it },
+//                modifier = Modifier.fillMaxWidth(),
+//                viewModel = mainViewModel
+//            )
+//
+//
+//
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            Text(
+//                text = "Continue",
+//                fontSize = 15.sp,
+//                fontWeight = FontWeight.Bold,
+//                color = Color.Black,
+//                modifier = Modifier
+//                    .align(alignment = Alignment.CenterHorizontally)
+//                    .padding(bottom = 1.dp)
+//                    .fillMaxWidth()
+//                    .background(Color(0xFFD2F801), RoundedCornerShape(16.dp))
+//                    .padding(horizontal = 135.dp, vertical = 15.dp)
+//                    .clickable {
+//
+//                        showDialog = false
+//                        val categoryId = getCategoryID(categoryName)
+//
+//                        mainViewModel.AddExpense(expenseName, expenseAmount, categoryId, token)
+//                    }
+//            )
+//
+//            if (showDialog) {
+//                TransactionNameDialog(
+//                    onDismiss = { showDialog = false },
+//                    onConfirm = { name ->
+//                        // Lakukan sesuatu dengan nama transaksi yang diinput
+//                        transactionName = name
+//                        // Tutup dialog setelah konfirmasi
+//                        showDialog = false
+//                    },
+//                    navController = navController
+//                )
+//            }
+//        }
+//    }
+//}
+
+
+
+
+
+
 

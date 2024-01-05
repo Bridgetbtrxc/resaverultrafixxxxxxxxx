@@ -51,8 +51,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.elflin.movieapps.R
 import com.elflin.movieapps.viewmodel.AuthViewModel
-import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
 
